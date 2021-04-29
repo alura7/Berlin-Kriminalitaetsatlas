@@ -59,7 +59,7 @@ server <- function(input, output) {
           )
     })
   )
-  # with Suche button - shows map with data regarding the type of crime 
+  # with "Suche" button - shows map with data regarding the type of crime 
   observeEvent(input$go, {
     withProgress(
       message = 'loading...',
@@ -74,6 +74,7 @@ server <- function(input, output) {
      # creating  a color palette for the  fill opacity setting a range to show the crime rate - 
           min_max_values <-  crime_map  %>% select(straftaten) %>% unlist() %>% as.numeric() %>% range(.,na.rm = TRUE)
           pal <- colorNumeric(palette = "Reds", domain=c(min_max_values[1], min_max_values[2]))
+    #creating a label
           label_berlin_map <- glue('<strong> <u>Bezirk: </u > </strong> <br /> 
                                     {crime_map$BEZNAME} : {crime_map$Bezeichnung..Bezirksregion.} <br />
                                    <strong> <u>Fallzahlen: </u ></strong> <br /> 
