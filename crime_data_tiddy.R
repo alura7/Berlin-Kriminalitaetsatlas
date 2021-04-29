@@ -2,10 +2,7 @@
 library("xlsx")
 library(rgdal)
 library(sf)
-library('dplyr')
 library('scales')
-library('htmlwidgets')
-library(forcats)
 library(stringr)
 library(tidyverse)
 library(readxl)
@@ -13,7 +10,7 @@ library(dplyr)
 library(broom)
 library(rgdal)
 
-library(ggplot2)
+
 
 
 
