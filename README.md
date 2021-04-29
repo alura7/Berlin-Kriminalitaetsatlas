@@ -5,7 +5,7 @@
 https://laura-onn.shinyapps.io/berlin_cw/?_ga=2.226057050.1733761437.1619449655-1142678055.1619449655
 
 Looking crime rates in Berlin districts using R shiny.
-Inspiation for this came from my favourite true crime podcast - Zeit Verbrechen and https://www.kriminalitaetsatlas.berlin.de/K-Atlas/atlas.html &
+Inspiration for this came from my favourite true crime podcast - Zeit Verbrechen and https://www.kriminalitaetsatlas.berlin.de/K-Atlas/atlas.html &
 https://shiny.rstudio.com/gallery/crime-watch.html
 
 I downloaded the data https://www.berlin.de/polizei/service/kriminalitaetsatlas/
