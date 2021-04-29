@@ -59,7 +59,7 @@ crime_unnested <- crime_unnested %>%
   mutate(Rauschgiftdelikte = coalesce(Rauschgift.delikte, Rauschgif.tdelikte)) %>% 
   select(-c(Rauschgift.delikte, Rauschgif.tdelikte)) 
 
-
+# rename the variables for better comprehension
 crime_unnested <- crime_unnested %>% dplyr::rename(
   "Straftaten Insgesamt" = "Straftaten...insgesamt.",
   "Straßenraub/Handtaschenraub" = "Straßenraub..Handtaschen.raub",
@@ -77,8 +77,10 @@ crime_unnested <- crime_unnested %>% dplyr::rename(
   "Sachbeschädigung durch Graffiti"= "Sach.beschädigung.durch.Graffiti"
 )
 
+# combine the spacial data with the crime data                         
 merged_map <- merge(maping, crime_unnested, by.x = "spatial_na" , by.y =  "LOR.Schlüssel..Bezirksregion.", all.x = T)
 
+# save the dataframe                       
 saveRDS(merged_map, file = "my_data.rds")
 
 
