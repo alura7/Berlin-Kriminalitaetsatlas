@@ -16,7 +16,7 @@ library(glue)
 
 
 merged_map <- readRDS("my_data.rds")
-colnames(merged_map)
+
 ui <- bootstrapPage(
 div(class= "outer",
     tags$head(includeCSS("style.css")),
