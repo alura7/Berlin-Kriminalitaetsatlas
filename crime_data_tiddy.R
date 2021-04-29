@@ -31,13 +31,11 @@ crime_tb_list <- lapply(crime_df, function(x) as_tibble(x))
 #convert list of tibble to tibble
 crime_tb <- tibble(file = sheetlist_Names, data = crime_tb_list) 
 
+#look for all observations that contain Bezirk ungewiss and remove they are still recorded in strafen insgesamt               
 crime_tb <- crime_tb %>% unnest(cols = c(data))  %>%
   filter(!grepl("Bezirk.*", Bezeichnung..Bezirksregion.))  %>% group_by(Year) %>% nest()
 
-#look for all observations that contain Bezirk ungewiss and remove they are still recorded in 
-#strafen insgesamt
-
-#map for the destriks not as detailed as LOR schüssel map - just the 12 districts from Berlin 
+#map for the destricts not as detailed as LOR schüssel map - just the 12 districts from Berlin 
 berlin.districts <- st_read("Berlin_Bezirke.shp")
 maping_districts <- sf::st_transform(berlin.districts, "+proj=longlat +datum=WGS84") 
 
@@ -55,7 +53,7 @@ crime_unnested <- crime_tb %>%  unnest(cols = c(data))
 crime_unnested[,5:22] <- sapply(crime_unnested[,5:22], as.numeric)
 
 crime_unnested <- crime_unnested %>% 
-  # as for some still to determined reason the column rauschgift delikte seperates into two - and need to be reunited 
+  # as for some still to determined reason the column rauschgift delikte seperates into two - and needs to be reunited 
   mutate(Rauschgiftdelikte = coalesce(Rauschgift.delikte, Rauschgif.tdelikte)) %>% 
   select(-c(Rauschgift.delikte, Rauschgif.tdelikte)) 
 
