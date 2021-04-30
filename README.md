@@ -8,6 +8,9 @@ Looking crime rates in Berlin districts using R shiny.
 Inspiration for this came from my favourite true crime podcast - Zeit Verbrechen and https://www.kriminalitaetsatlas.berlin.de/K-Atlas/atlas.html &
 https://shiny.rstudio.com/gallery/crime-watch.html
 
-I downloaded the data https://www.berlin.de/polizei/service/kriminalitaetsatlas/
+I downloaded the data from:
+https://www.berlin.de/polizei/service/kriminalitaetsatlas/
+The shp file was downloaded from:
+https://opendata-esri-de.opendata.arcgis.com/datasets/9418b96664554dbf9f92f94ed2d102cc_0?geometry=12.453%2C52.361%2C14.396%2C52.653
 
 I will continue to clean up the code and maybe add some features 
