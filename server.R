@@ -9,19 +9,18 @@
 
 library(shiny)
 library(leaflet)
-library(rgdal)
 library(sf)
 library('htmlwidgets')
 library(stringr)
 library(tidyverse)
 library(dplyr)
 library(htmltools)
-library(broom)
-library(purrr)
 library(glue)
+library(gridExtra)
 library(ggplot2)
-library("xlsx")
-library(readxl)
+library(DT)
+
+
 
 #uplaod tiddied data 
 merged_map <- readRDS("my_data.rds")
@@ -32,8 +31,9 @@ server <- function(input, output) {
   withProgress(
    
     message = 'loading...',
+    
+  ## map of Berlin before any buttons are pressed 
     output$map <- renderLeaflet({
-  #map of Berlin before any buttons are pressed 
       leaflet() %>%
         addProviderTiles("CartoDB.Positron") %>% 
         addPolygons(
@@ -44,7 +44,7 @@ server <- function(input, output) {
           fillOpacity = 0.01,
           color = "#444444"
         ) %>% 
-        # adding second Polygons with the distircts further divided into smaller area
+    ## adding second Polygons with the distircts further divided into smaller area
         addPolygons(
           data =  merged_map,
           stroke = T,
@@ -59,7 +59,10 @@ server <- function(input, output) {
           )
     })
   )
-  # with "Suche" button - shows map with data regarding the type of crime 
+  
+  ## with "Suche" button - shows map with data regarding the type of crime 
+  
+ 
   observeEvent(input$go, {
     withProgress(
       message = 'loading...',
@@ -71,14 +74,18 @@ server <- function(input, output) {
         tryCatch({   
           
           incProgress(1/5)
-     # creating  a color palette for the  fill opacity setting a range to show the crime rate - 
+          
+     ## creating  a color palette for the  fill opacity - setting a range to show the crime rate 
+
           min_max_values <-  crime_map  %>% select(straftaten) %>% unlist() %>% as.numeric() %>% range(.,na.rm = TRUE)
           pal <- colorNumeric(palette = "Reds", domain=c(min_max_values[1], min_max_values[2]))
-    #creating a label
+          
+    ## labels for maps
+          
           label_berlin_map <- glue('<strong> <u>Bezirk: </u > </strong> <br /> 
                                     {crime_map$BEZNAME} : {crime_map$Bezeichnung..Bezirksregion.} <br />
                                    <strong> <u>Fallzahlen: </u ></strong> <br /> 
-                                   {straftaten} : {crime_map[[straftaten]]}') %>%  lapply(htmltools::HTML)
+                                   {straftaten} :<strong> {crime_map[[straftaten]]}') %>%  lapply(htmltools::HTML)
           
           leafletProxy("map") %>% 
             clearShapes() %>% 
@@ -115,7 +122,10 @@ server <- function(input, output) {
     )
     
   })
-  # Graph display of data using ggplot 
+
+  
+  ## Graph display of data using ggplot 
+  
   observeEvent(input$chart, {
     
     straftaten <- input$straftaten
@@ -126,6 +136,7 @@ server <- function(input, output) {
       straftaten_insgesamt_graph <- crime_unnested %>% 
         select(Bezeichnung..Bezirksregion.,Year, straftaten) %>% 
         filter(str_detect(Bezeichnung..Bezirksregion., "gesamt")) 
+       crime_unnested %>%   filter(str_detect(Bezeichnung..Bezirksregion., "gesamt")) 
       
       output$line_graph<- renderPlot({
         ggplot(data = straftaten_insgesamt_graph, aes(x = Year, y= straftaten_insgesamt_graph[[straftaten]])) +
@@ -143,19 +154,66 @@ server <- function(input, output) {
     }
     )
   })
-  # To inform on the data with link to website 
+  ## information Button pop-up window to inform on the data with link to website 
+  
   observeEvent(input$information_button, {
     showModal(modalDialog(title = 'Information',
                           footer = modalButton("Exit"),
                           easyClose = T,
                           "Diese Anwendung erhebt keinen Anspruch auf Vollständigkeit.
-                            Die Daten für den Kriminalatlas stammen von: \n 
+                          Die Daten für den Kriminalatlas stammen von: \n 
                           https://www.berlin.de/polizei/service/kriminalitaetsatlas. \n
                           Für mehr Information Bitte klicken Sie auf den", 
                           tags$a(href = 'https://www.berlin.de/polizei/service/kriminalitaetsatlas/', "Link"))
                          
               ) 
   })
+  
+  
+
+  #navbar graph 
+  
+  output$plot <- renderPlot({
+    withProgress(
+      message = 'loading...',
+      value = 1/5, {  
+       
+      
+      straftaten_graph <- crime_unnested %>% filter(str_detect(Bezeichnung..Bezirksregion., "gesamt")) 
+      
+      #  straftaten_list
+      
+    straftaten_list <- colnames(straftaten_graph[,5:21])
+    
+
+    # function that plots a given variable
+
+    plot_graph <- function(yvar) {
+      ggplot(data = straftaten_graph, aes(x = Year, y= straftaten_graph[[yvar]])) +
+        ylab("Fallzahlen") +
+        xlab("Jahr") +
+        geom_line(color="#69b3a2", size = 1, alpha = 0.8) +
+        ggtitle(paste0("Fallzahlen von 2012 bis 2019:\n", yvar)) +
+        theme_bw()
+    }
+    
+  
+   ##Apply this function to all Straftaten columns in the dataset. Use do.call to see the graphs displayed together 
+    
+    do.call(grid.arrange,lapply(straftaten_list, plot_graph))
+      }
+    )
+  })
+  
+  
+  ##create a data object to display data
+  
+ colnames(merged_map)
+  output$data <-DT::renderDataTable(
+    datatable(
+    merged_map[,c(-1:-11,-13)],filter = 'top'
+  ))
+  
 }
 
 # Run the application 
